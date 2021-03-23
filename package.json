@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "ETL worker for csv files",
   "main": "index.js",
+  "engines": {
+    "node": ">=14.15.6"
+  },
   "scripts": {
     "postinstall": "husky install",
     "lint": "eslint .",
