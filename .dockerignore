@@ -106,4 +106,11 @@ dist
 #IDE
 .vscode
 .history
-output/report.xml
+
+.husky
+.git
+.gitignore
+.eslintrc.json
+docker-compose.yml
+tests
+output

@@ -1,0 +1,12 @@
+{
+  "extends": "standard",
+  "env": {
+    "node": true,
+    "es2020": true
+  },
+  "rules": {
+    "indent": ["error", 2],
+    "semi": ["error", "always"],
+    "comma-dangle": ["error", "always-multiline"]
+  }
+}
