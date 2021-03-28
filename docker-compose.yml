@@ -1,19 +1,15 @@
 version: '3'
 
 services:
-  worker:
-    container_name: worker
+  worker-challenge2021:
+    container_name: worker-challenge2021
     build:
       context: .
-      dockerfile: Dockerfile
-    environment:
-      MONGO_URI: mongodb://mongo:27017
-      MONGO_DB: db
     depends_on:
-      - mongo
+      - mongo-challenge2021
 
-  mongo:
-    container_name: mongo
+  mongo-challenge2021:
+    container_name: mongo-challenge2021
     image: mongo:4.4-bionic
     ports:
       - 27017:27017

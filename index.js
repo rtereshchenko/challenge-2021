@@ -1,7 +1,7 @@
 const { createReadStream } = require('fs');
-const { resolve } = require('path');
+const { resolve: resolvePath } = require('path');
 const csv = require('csvtojson');
-const { v4: uuid } = require('uuid');
+const config = require('config');
 const {
   connectToDb,
   getCollections,
@@ -13,8 +13,10 @@ const {
   daysToScheduleEmails,
 } = require('./constants');
 
+const { sourceFile } = config;
+
 const run = async () => {
-  const source = createReadStream(resolve(__dirname, 'sample-data/data.csv'));
+  const source = createReadStream(resolvePath(__dirname, sourceFile));
 
   await connectToDb();
   const { patients, emails } = await getCollections();
@@ -28,12 +30,12 @@ const run = async () => {
             await patients.insertOne(record);
 
             if (emailRegex.test(record['Email Address'])) {
+              const currentTime = new Date().getTime();
               const emailRecords = daysToScheduleEmails
                 .map(days => ({
-                  id: uuid(),
                   email: record['Email Address'],
                   name: `Day ${days}`,
-                  scheduled_date: new Date().getTime() + (days * dayInMs),
+                  scheduled_date: new Date(currentTime + (days * dayInMs)),
                 }));
 
               await emails.insertMany(emailRecords);

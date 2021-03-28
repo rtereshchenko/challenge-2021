@@ -1,14 +1,12 @@
+const config = require('config');
 const { MongoClient } = require('mongodb');
 
-const {
-  MONGO_URI,
-  MONGO_DB,
-} = process.env;
+const { uri: mongoUri, db: mongoDb } = config.mongo;
 
-const connectToDb = async () => MongoClient.connect(MONGO_URI, { useUnifiedTopology: true });
+const connectToDb = async () => MongoClient.connect(mongoUri, { useUnifiedTopology: true });
 
 const getCollections = async connection => {
-  const db = await connection.db(MONGO_DB);
+  const db = await connection.db(mongoDb);
   const patients = await db.collection('Patients');
   const emails = await db.collection('Emails');
 

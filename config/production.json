@@ -1,0 +1,5 @@
+{
+  "mongo": {
+    "uri": "mongodb://mongo-challenge2021:27017"
+  }
+}

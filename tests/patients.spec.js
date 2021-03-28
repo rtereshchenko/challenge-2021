@@ -1,6 +1,6 @@
 const csv = require('csvtojson');
 const { expect } = require('chai');
-const { resolve } = require('path');
+const { resolve: resolvePath } = require('path');
 
 describe('patients loaded correctly', () => {
   before(async function () {
@@ -13,7 +13,7 @@ describe('patients loaded correctly', () => {
   });
 
   before(async function () {
-    this.flatFileRecords = await csv({ delimiter: '|' }).fromFile(resolve(__dirname, '../sample-data/data.csv'));
+    this.flatFileRecords = await csv({ delimiter: '|' }).fromFile(resolvePath(__dirname, '../sample-data/data.csv'));
     this.consentedPatients = this.flatFileRecords.filter(({ CONSENT }) => CONSENT === 'Y');
   });
 

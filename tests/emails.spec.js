@@ -1,15 +1,14 @@
 const csv = require('csvtojson');
+const config = require('config');
 const { expect } = require('chai');
-const { resolve } = require('path');
+const { resolve: resolvePath } = require('path');
+const { dayInMs } = require('../constants');
 
-const dayInMs = 86_400_000;
+const { sourceFile } = config;
 
 describe('emails scheduled correctly', () => {
   before(async function () {
     const cursor = await this.emails.find({}, {
-      projection: {
-        _id: 0,
-      },
       sort: {
         scheduled_date: 1,
       },
@@ -24,7 +23,7 @@ describe('emails scheduled correctly', () => {
   });
 
   before(async function () {
-    this.flatFileRecords = await csv({ delimiter: '|' }).fromFile(resolve(__dirname, '../sample-data/data.csv'));
+    this.flatFileRecords = await csv({ delimiter: '|' }).fromFile(resolvePath(__dirname, '../', sourceFile));
     this.consentedPatients = this.flatFileRecords.filter(({ CONSENT }) => CONSENT === 'Y');
   });
 
@@ -33,7 +32,7 @@ describe('emails scheduled correctly', () => {
     expect(this.foundEmails).to.have.lengthOf(patientsWithEmailFromFile.length * 4);
 
     this.foundEmails.forEach(email => {
-      expect(email).to.have.property('id');
+      expect(email).to.have.property('_id');
       expect(email).to.have.property('name').and.matches(/^Day\s[1234]$/);
       expect(email).to.have.property('email');
       expect(email).to.have.property('scheduled_date');
@@ -48,10 +47,11 @@ describe('emails scheduled correctly', () => {
           expect(email).to.have.property('name').and.equals(`Day ${idx + 1}`);
 
           if (idx === 0) {
-            prevScheduledDate = email.scheduled_date;
+            prevScheduledDate = email.scheduled_date.getTime();
           } else {
-            expect(email).to.have.property('scheduled_date').that.equals(prevScheduledDate + dayInMs);
-            prevScheduledDate = email.scheduled_date;
+            expect(email).to.have.property('scheduled_date');
+            expect(email.scheduled_date.getTime()).to.equal(prevScheduledDate + dayInMs);
+            prevScheduledDate = email.scheduled_date.getTime();
           }
         });
       });
