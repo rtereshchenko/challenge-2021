@@ -1,13 +1,11 @@
 const { getEmailCollection } = require('../db');
-
-const defaultSort = {
-  scheduled_date: 1,
-};
+const { defaultSort } = require('../../constants');
 
 const getEmails = async (filter = {}, sort = defaultSort) => {
   const emailCollection = await getEmailCollection();
   const cursor = await emailCollection.find(filter, { sort });
-  return await cursor.toArray();
+  const emails = await cursor.toArray();
+  return emails;
 };
 
 const addEmailsBulk = async emails => {

@@ -2,5 +2,10 @@
   "mongo": {
     "uri": "MONGO_URI",
     "db": "MONGO_DB"
+  },
+  "sourceFile": "SOURCE_FILE",
+  "killTimeout": {
+    "__name": "KILL_TIMEOUT",
+    "__format": "json"
   }
 }

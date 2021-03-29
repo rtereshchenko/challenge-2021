@@ -1,13 +1,11 @@
 const { getPatientCollection } = require('../db');
-
-const defaultProjection = {
-  _id: 0,
-};
+const { defaultProjection } = require('../../constants');
 
 const getPatients = async (filter = {}, sort = {}, projection = defaultProjection) => {
   const patientCollection = await getPatientCollection();
   const cursor = await patientCollection.find(filter, { sort, projection });
-  return await cursor.toArray();
+  const patients = await cursor.toArray();
+  return patients;
 };
 
 const addPatient = async patient => {

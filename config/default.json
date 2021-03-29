@@ -3,5 +3,6 @@
     "uri": "mongodb://localhost:27017",
     "db": "challenge2021"
   },
-  "sourceFile": "sample-data/data.csv"
+  "sourceFile": "sample-data/data.csv",
+  "killTimeout": 2000
 }

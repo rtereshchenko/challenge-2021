@@ -1,5 +1,5 @@
-const { closeConnection } = require('../common/db');
+const { shutdown } = require('../common/graceful-shutdown');
 
 after(async function () {
-  await closeConnection();
+  await shutdown();
 });
