@@ -13,6 +13,8 @@ const { addEmailsBulk } = require('../common/helpers/emails');
 const { sourceFile } = config;
 
 const runApp = async () => {
+  console.log('starting app...');
+
   const source = createReadStream(resolvePath(__dirname, '../', sourceFile));
 
   await new Promise((resolve, reject) => {
@@ -40,6 +42,8 @@ const runApp = async () => {
         () => resolve(),
       );
   });
+
+  console.log('task completed');
 };
 
 module.exports = {

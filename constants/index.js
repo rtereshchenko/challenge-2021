@@ -10,10 +10,13 @@ const defaultProjection = {
   _id: 0,
 };
 
+const signals = ['SIGINT', 'SIGTERM'];
+
 module.exports = {
   emailRegex,
   dayInMs,
   daysToScheduleEmails,
   defaultSort,
   defaultProjection,
+  signals,
 };
