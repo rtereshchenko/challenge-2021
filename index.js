@@ -2,24 +2,19 @@ const { createReadStream } = require('fs');
 const { resolve: resolvePath } = require('path');
 const csv = require('csvtojson');
 const config = require('config');
-const {
-  connectToDb,
-  getCollections,
-  closeConnection,
-} = require('./helpers');
+const { closeConnection } = require('./common/db');
 const {
   emailRegex,
   dayInMs,
   daysToScheduleEmails,
 } = require('./constants');
+const { addPatient } = require('./common/helpers/patients');
+const { addEmailsBulk } = require('./common/helpers/emails');
 
 const { sourceFile } = config;
 
 const run = async () => {
   const source = createReadStream(resolvePath(__dirname, sourceFile));
-
-  await connectToDb();
-  const { patients, emails } = await getCollections();
 
   await new Promise((resolve, reject) => {
     csv({ delimiter: '|' })
@@ -27,7 +22,7 @@ const run = async () => {
       .subscribe(
         async record => {
           if (record.CONSENT === 'Y') {
-            await patients.insertOne(record);
+            await addPatient(record);
 
             if (emailRegex.test(record['Email Address'])) {
               const currentTime = new Date().getTime();
@@ -38,7 +33,7 @@ const run = async () => {
                   scheduled_date: new Date(currentTime + (days * dayInMs)),
                 }));
 
-              await emails.insertMany(emailRecords);
+              await addEmailsBulk(emailRecords);
             }
           }
         },
@@ -46,12 +41,10 @@ const run = async () => {
         () => resolve(),
       );
   });
-
-  await closeConnection();
 };
 
 run()
   .catch(err => {
     console.log(err);
-    process.exit(1);
-  });
+  })
+  .finally(closeConnection);

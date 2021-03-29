@@ -3,18 +3,19 @@ const config = require('config');
 const { expect } = require('chai');
 const { resolve: resolvePath } = require('path');
 const { dayInMs } = require('../constants');
+const { getEmails } = require('../common/helpers/emails');
 
 const { sourceFile } = config;
 
 describe('emails scheduled correctly', () => {
+  let foundEmails;
+  let groupedEmails;
+  let flatFileRecords;
+  let consentedPatients;
+
   before(async function () {
-    const cursor = await this.emails.find({}, {
-      sort: {
-        scheduled_date: 1,
-      },
-    });
-    this.foundEmails = await cursor.toArray();
-    this.groupedEmails = this.foundEmails.reduce((grouped, email) => {
+    foundEmails = await getEmails();
+    groupedEmails = foundEmails.reduce((grouped, email) => {
       grouped[email.email] = grouped[email.email]
         ? grouped[email.email].concat(email)
         : [email];
@@ -23,15 +24,15 @@ describe('emails scheduled correctly', () => {
   });
 
   before(async function () {
-    this.flatFileRecords = await csv({ delimiter: '|' }).fromFile(resolvePath(__dirname, '../', sourceFile));
-    this.consentedPatients = this.flatFileRecords.filter(({ CONSENT }) => CONSENT === 'Y');
+    flatFileRecords = await csv({ delimiter: '|' }).fromFile(resolvePath(__dirname, '../', sourceFile));
+    consentedPatients = flatFileRecords.filter(({ CONSENT }) => CONSENT === 'Y');
   });
 
   it('emails were created in Emails Collection for patients who have CONSENT as Y', async function () {
-    const patientsWithEmailFromFile = this.consentedPatients.filter(patient => patient['Email Address']);
-    expect(this.foundEmails).to.have.lengthOf(patientsWithEmailFromFile.length * 4);
+    const patientsWithEmailFromFile = consentedPatients.filter(patient => patient['Email Address']);
+    expect(foundEmails).to.have.lengthOf(patientsWithEmailFromFile.length * 4);
 
-    this.foundEmails.forEach(email => {
+    foundEmails.forEach(email => {
       expect(email).to.have.property('_id');
       expect(email).to.have.property('name').and.matches(/^Day\s[1234]$/);
       expect(email).to.have.property('email');
@@ -40,7 +41,7 @@ describe('emails scheduled correctly', () => {
   });
 
   it('emails for each patient are scheduled correctly', async function () {
-    Object.values(this.groupedEmails)
+    Object.values(groupedEmails)
       .forEach(group => {
         let prevScheduledDate = 0;
         group.forEach((email, idx) => {
