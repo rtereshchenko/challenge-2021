@@ -6,9 +6,14 @@ const { killTimeout } = config;
 
 const shutdown = async () => {
   console.log('stopping app...');
+  const timer = setTimeout(async () => {
+    console.log('force shutdown');
+    await closeDbConnection({ force: true });
+  }, killTimeout);
+
   await closeDbConnection();
-  await new Promise(resolve => setTimeout(resolve, killTimeout));
-  await closeDbConnection({ force: true });
+  clearTimeout(timer);
+
   console.log('app stopped');
 };
 
